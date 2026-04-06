@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Träning">
+  <meta name="theme-color" content="#0f172a">
+  <title>Träningsdashboard</title>
+  <!-- PWA Manifest (inline via data URI) -->
+  <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiVHLDpG5pbmdzZGFzaGJvYXJkIiwic2hvcnRfbmFtZSI6IlRyw6RuaW5nIiwiZGVzY3JpcHRpb24iOiJEaXR0IHBlcnNvbmxpZ2EgdHLDpG5pbmdzc2NoZW1hIiwic3RhcnRfdXJsIjoiLiIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiMwZjE3MmEiLCJ0aGVtZV9jb2xvciI6IiMwZjE3MmEiLCJpY29ucyI6W119">
+  <!-- App icon as inline SVG data URI for Apple -->
+  <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxODAgMTgwIj48cmVjdCB3aWR0aD0iMTgwIiBoZWlnaHQ9IjE4MCIgcng9IjQwIiBmaWxsPSIjMGYxNzJhIi8+PHRleHQgeD0iOTAiIHk9IjExNSIgZm9udC1zaXplPSI5MCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+8J+SpjwvdGV4dD48L3N2Zz4=">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    :root {
+      --bg: #0f172a;
+      --bg2: #1e293b;
+      --bg3: #334155;
+      --text: #e2e8f0;
+      --text2: #94a3b8;
+      --text3: #64748b;
+      --blue: #3b82f6;
+      --green: #22c55e;
+      --orange: #f97316;
+      --purple: #8b5cf6;
+      --cyan: #06b6d4;
+      --red: #ef4444;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    html, body {
+      width: 100%; height: 100%;
+      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      overflow: hidden;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* === LAYOUT === */
+    .app-shell {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      height: 100dvh;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .app-header {
+      padding: calc(16px + var(--safe-top)) 20px 12px;
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      flex-shrink: 0;
+    }
+
+    .app-header h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+    .app-header .sub { font-size: 11px; color: var(--text2); letter-spacing: 1.5px; text-transform: uppercase; margin-top: 2px; }
+
+    .nav-bar {
+      display: flex; gap: 4px; padding: 8px 12px 10px;
+      background: var(--bg); border-bottom: 1px solid var(--bg2);
+      flex-shrink: 0; overflow-x: auto;
+    }
+    .nav-bar::-webkit-scrollbar { display: none; }
+
+    .nav-btn {
+      flex: 1; min-width: 0;
+      padding: 10px 6px; background: var(--bg2); border: none; border-radius: 10px;
+      color: var(--text2); font-size: 11px; font-weight: 700; cursor: pointer;
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+      transition: all 0.2s; font-family: inherit; white-space: nowrap;
+    }
+    .nav-btn.active { background: var(--blue); color: #fff; }
+    .nav-btn .ico { font-size: 16px; }
+
+    .scroll-area {
+      flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
+      padding: 16px; padding-bottom: calc(24px + var(--safe-bottom));
+    }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; animation: fadeUp 0.2s ease-out; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+    /* === CARDS === */
+    .card {
+      background: var(--bg2); border-radius: 14px; padding: 16px;
+      margin-bottom: 12px; border: 1px solid var(--bg3);
+    }
+
+    /* === TODAY HERO === */
+    .hero {
+      border-radius: 16px; padding: 24px 20px; margin-bottom: 16px;
+      position: relative; overflow: hidden; color: #fff;
+    }
+    .hero .bg-emoji { position: absolute; right: 16px; top: 12px; font-size: 56px; opacity: 0.15; }
+    .hero .label { font-size: 11px; opacity: 0.85; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; }
+    .hero .title { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
+    .hero .meta { font-size: 13px; opacity: 0.75; }
+
+    /* === EXERCISE LIST === */
+    .ex-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 0; cursor: pointer;
+      border-bottom: 1px solid #1e293b;
+      transition: opacity 0.2s;
+    }
+    .ex-item:last-child { border-bottom: none; }
+    .ex-item.done { opacity: 0.45; }
+
+    .check-circle {
+      width: 24px; height: 24px; border-radius: 7px; flex-shrink: 0;
+      border: 2px solid var(--bg3); background: transparent;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; color: #fff; transition: all 0.15s;
+    }
+    .check-circle.on { background: var(--green); border-color: var(--green); }
+
+    .ex-name { font-size: 14px; font-weight: 600; }
+    .ex-name.struck { text-decoration: line-through; }
+    .ex-reps { font-size: 12px; color: var(--text2); margin-top: 2px; }
+    .ex-notes { font-size: 11px; color: var(--text3); margin-top: 1px; font-style: italic; }
+
+    /* === BIG BUTTON === */
+    .btn-big {
+      width: 100%; padding: 14px; border: none; border-radius: 12px;
+      font-size: 14px; font-weight: 700; cursor: pointer;
+      font-family: inherit; color: #fff; transition: all 0.15s; margin-top: 12px;
+    }
+    .btn-big:active { transform: scale(0.98); }
+
+    /* === STATS GRID === */
+    .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
+    .stat { text-align: center; padding: 12px 8px; }
+    .stat .val { font-size: 22px; font-weight: 800; color: var(--blue); }
+    .stat .lbl { font-size: 10px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; margin-top: 4px; }
+
+    /* === SCHEDULE DAY CARD === */
+    .day-card {
+      cursor: pointer; transition: border-color 0.2s;
+    }
+    .day-card.today-border { border: 2px solid var(--blue); }
+    .day-card.done-border { border-color: rgba(34,197,94,0.4); }
+
+    .day-row { display: flex; align-items: center; gap: 12px; }
+    .day-emoji { font-size: 26px; }
+    .day-name { font-size: 15px; font-weight: 700; }
+    .day-badge { font-size: 9px; background: var(--blue); padding: 2px 6px; border-radius: 4px; font-weight: 700; margin-left: 6px; }
+    .day-type { font-size: 12px; color: var(--text2); margin-top: 2px; }
+    .day-dur { font-size: 11px; color: var(--text3); }
+
+    .day-check-big {
+      width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+      border: 2px solid var(--bg3); background: transparent;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; color: #fff; cursor: pointer; transition: all 0.15s;
+    }
+    .day-check-big.on { background: var(--green); border-color: var(--green); }
+
+    .day-exercises { margin-top: 14px; border-top: 1px solid var(--bg3); padding-top: 12px; }
+
+    /* === CALENDAR === */
+    .cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .cal-arrow {
+      background: var(--bg2); border: 1px solid var(--bg3); border-radius: 8px;
+      color: var(--text); padding: 8px 16px; cursor: pointer; font-size: 16px; font-weight: 700; font-family: inherit;
+    }
+    .cal-arrow:active { background: var(--bg3); }
+    .cal-label { font-size: 18px; font-weight: 800; text-align: center; }
+    .cal-sub { font-size: 12px; color: var(--text2); text-align: center; margin-top: 2px; }
+
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+    .cal-hdr { text-align: center; font-size: 10px; font-weight: 700; color: var(--text3); text-transform: uppercase; padding: 6px 0; }
+    .cal-day {
+      aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+      border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer;
+      background: transparent; color: var(--text2); border: 1px solid transparent;
+      transition: all 0.15s; min-height: 36px;
+    }
+    .cal-day:active { transform: scale(0.92); }
+    .cal-day.today { border-color: var(--blue); color: var(--blue); background: rgba(59,130,246,0.1); }
+    .cal-day.done { background: var(--blue); color: #fff; border-color: var(--blue); }
+
+    .year-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 12px; }
+    .year-month {
+      text-align: center; padding: 10px 4px; border-radius: 8px; cursor: pointer;
+      border: 1px solid transparent; transition: all 0.15s;
+    }
+    .year-month.sel { background: rgba(59,130,246,0.15); border-color: rgba(59,130,246,0.3); }
+    .year-month .mn { font-size: 11px; font-weight: 700; color: var(--text2); }
+    .year-month.sel .mn { color: var(--blue); }
+    .year-month .cnt { font-size: 16px; font-weight: 800; margin-top: 2px; }
+
+    /* === RECORDS === */
+    .rec-row { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+    .rec-icon { font-size: 26px; }
+    .rec-lbl { font-size: 12px; color: var(--text2); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+    .rec-input {
+      width: 100%; padding: 10px 12px; background: var(--bg); border: 1px solid var(--bg3);
+      border-radius: 8px; color: var(--text); font-size: 18px; font-weight: 700;
+      font-family: inherit; outline: none; -webkit-appearance: none;
+    }
+    .rec-input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(59,130,246,0.15); }
+
+    .total-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .total-box { text-align: center; padding: 18px; background: var(--bg); border-radius: 10px; }
+    .total-val { font-size: 28px; font-weight: 800; }
+    .total-lbl { font-size: 11px; color: var(--text2); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* Training detail picker */
+    .detail-select {
+      width: 100%; padding: 10px 12px; background: var(--bg); border: 1px solid var(--bg3);
+      border-radius: 8px; color: var(--text); font-size: 14px; font-family: inherit;
+      -webkit-appearance: none; outline: none; cursor: pointer;
+    }
+    .detail-select:focus { border-color: var(--blue); }
+    .detail-item {
+      background: var(--bg); border-radius: 8px; padding: 12px; margin-top: 10px;
+      border-left: 3px solid var(--blue);
+    }
+    .detail-name { font-size: 13px; font-weight: 700; margin-bottom: 8px; }
+    .detail-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .detail-inp {
+      padding: 8px; background: var(--bg2); border: 1px solid var(--bg3); border-radius: 6px;
+      color: var(--text); font-size: 13px; font-family: inherit; outline: none; -webkit-appearance: none;
+    }
+    .detail-inp:focus { border-color: var(--blue); }
+
+    .btn-danger {
+      width: 100%; padding: 12px; background: transparent;
+      border: 1px solid rgba(239,68,68,0.3); border-radius: 10px;
+      color: var(--red); font-size: 13px; font-weight: 600; cursor: pointer;
+      font-family: inherit; margin-top: 12px;
+    }
+
+    /* === PROGRESS BAR === */
+    .pbar { height: 6px; background: var(--bg3); border-radius: 3px; overflow: hidden; }
+    .pbar-fill { height: 100%; background: linear-gradient(90deg, var(--blue), var(--green)); border-radius: 3px; transition: width 0.3s; }
+
+    /* === WEEK PROGRESS MINI === */
+    .week-mini { display: flex; align-items: center; gap: 12px; padding: 14px 16px; }
+    .week-label { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; white-space: nowrap; }
+    .week-val { font-size: 14px; font-weight: 800; color: var(--blue); }
+
+    /* === DESKTOP ENHANCEMENTS === */
+    @media (min-width: 768px) {
+      .app-header { padding: 20px 24px 14px; }
+      .app-header h1 { font-size: 26px; }
+      .scroll-area { padding: 20px 24px; }
+      .nav-btn { padding: 12px 16px; font-size: 12px; flex-direction: row; gap: 6px; }
+      .week-grid-desktop { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+      .stats-row { grid-template-columns: repeat(3, 1fr); gap: 12px; }
+      .cal-grid .cal-day { min-height: 44px; font-size: 13px; }
+      .year-grid { grid-template-columns: repeat(6, 1fr); }
+      .total-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+
+    @media (min-width: 1024px) {
+      .week-grid-desktop { grid-template-columns: repeat(3, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <div class="app-header">
+      <h1>💪 Träning</h1>
+      <div class="sub">Ditt personliga träningsschema</div>
+    </div>
+
+    <div class="nav-bar" id="navBar"></div>
+
+    <div class="scroll-area" id="scrollArea">
+      <div id="tab-home" class="tab-panel active"></div>
+      <div id="tab-schedule" class="tab-panel"></div>
+      <div id="tab-calendar" class="tab-panel"></div>
+      <div id="tab-records" class="tab-panel"></div>
+    </div>
+  </div>
+
+  <script>
+    // ===== TRAINING DATA =====
+    const schedule = {
+      Måndag: {
+        type: 'Träning A – Push + Posterior', duration: '45–60 min', emoji: '🏋️', color: '#3b82f6',
+        exercises: [
+          { name: 'Kettlebell Deadlift', reps: '4×8-10', notes: 'Stark rumpa & baksida lår' },
+          { name: 'Armhävningar', reps: '4×max–2', notes: 'Lämna 2 i tanken' },
+          { name: 'KB Single-Leg RDL', reps: '3×10-12/ben', notes: 'Balans + rumpa' },
+          { name: 'Dips', reps: '4×8-12', notes: '' },
+          { name: 'Face pulls / KB rows', reps: '3×12-15', notes: 'Övre rygg & hållning' },
+          { name: 'Planka Shoulder taps', reps: '3×30-40s', notes: 'Anti-extension core' }
+        ]
+      },
+      Tisdag: {
+        type: 'Rehab & Rörlighet', duration: '20–30 min', emoji: '🧘', color: '#8b5cf6',
+        exercises: [
+          { name: 'Höftböjare-stretch (90/90)', reps: '2×60-90 sek/sida', notes: '' },
+          { name: 'Adductor rock back', reps: '2 min', notes: 'Grodläge' },
+          { name: 'Glute bridge hold med band', reps: '3×30-45 sek', notes: '' },
+          { name: 'Cat-cow + thoracic rotations', reps: '10 varv', notes: '' },
+          { name: 'Dead bugs', reps: '3×10/sida', notes: 'Långsamt' },
+          { name: "Child's pose + bröstryggsrot.", reps: '2 min', notes: '' },
+          { name: 'Standing hip hinge + wall touch', reps: '2×15', notes: 'Neutral bäcken' }
+        ]
+      },
+      Onsdag: {
+        type: 'Träning B – Pull + Core', duration: '45–60 min', emoji: '💪', color: '#06b6d4',
+        exercises: [
+          { name: 'Chin-ups / Pull-ups', reps: '4×max–1', notes: 'Mål: öka reps' },
+          { name: 'KB Gorilla Rows', reps: '4×10-12/arm', notes: 'Rygg & grepp' },
+          { name: 'Inverted rows', reps: '3×10-12', notes: '' },
+          { name: 'Hollow Hold', reps: '4×20-40s', notes: 'Super mot APT' },
+          { name: 'Hanging Leg Raises', reps: '3×12-15', notes: 'Nedre magen' },
+          { name: 'Bird-Dog', reps: '3×12-15/sida', notes: 'Perfekt för hållning' }
+        ]
+      },
+      Torsdag: {
+        type: 'Rehab & Rörlighet', duration: '20–30 min', emoji: '🧘', color: '#8b5cf6',
+        exercises: [
+          { name: 'Höftböjare-stretch (90/90)', reps: '2×60-90 sek/sida', notes: '' },
+          { name: 'Adductor rock back', reps: '2 min', notes: 'Grodläge' },
+          { name: 'Glute bridge hold med band', reps: '3×30-45 sek', notes: '' },
+          { name: 'Cat-cow + thoracic rotations', reps: '10 varv', notes: '' },
+          { name: 'Dead bugs', reps: '3×10/sida', notes: 'Långsamt' },
+          { name: "Child's pose + bröstryggsrot.", reps: '2 min', notes: '' },
+          { name: 'Standing hip hinge + wall touch', reps: '2×15', notes: 'Neutral bäcken' }
+        ]
+      },
+      Fredag: {
+        type: 'Träning C – Legs + KB Power', duration: '50–60 min', emoji: '🔥', color: '#f97316',
+        exercises: [
+          { name: 'KB Goblet Squats', reps: '4×10-12', notes: 'Djup & upprätt' },
+          { name: 'KB Swings', reps: '4×15-20', notes: 'Explosiv höft' },
+          { name: 'Bulgarian Split Squats', reps: '3×10-12/ben', notes: 'Rumpa & stabilitet' },
+          { name: 'KB Thrusters', reps: '3×10-12', notes: 'Helkropp' },
+          { name: 'Glute Bridge', reps: '3×12-15', notes: 'Aktivera max' },
+          { name: 'Dead Bug', reps: '3×12-15/sida', notes: 'Core utan svank' }
+        ]
+      },
+      Lördag: {
+        type: 'Vila / Aktiv återhämtning', duration: '–', emoji: '😴', color: '#6b7280',
+        exercises: [{ name: 'Promenad, lätt yoga, fotboll', reps: '', notes: '' }]
+      },
+      Söndag: {
+        type: 'Stretch', duration: '15–20 min', emoji: '🌿', color: '#22c55e',
+        exercises: [{ name: 'Fullkroppsstretch', reps: '15-20 min', notes: 'Höftböjare & bröstrygg' }]
+      }
+    };
+
+    const trainingExercises = {
+      A: ['Kettlebell Deadlift','Armhävningar','KB Single-Leg RDL','Dips','Face pulls / KB rows','Planka Shoulder taps'],
+      B: ['Chin-ups / Pull-ups','KB Gorilla Rows','Inverted rows','Hollow Hold','Hanging Leg Raises','Bird-Dog'],
+      C: ['KB Goblet Squats','KB Swings','Bulgarian Split Squats','KB Thrusters','Glute Bridge','Dead Bug']
+    };
+
+    const dayNames = ['Måndag','Tisdag','Onsdag','Torsdag','Fredag','Lördag','Söndag'];
+    const monthShort = ['Jan','Feb','Mar','Apr','Maj','Jun','Jul','Aug','Sep','Okt','Nov','Dec'];
+    const monthFull = ['Januari','Februari','Mars','April','Maj','Juni','Juli','Augusti','September','Oktober','November','December'];
+
+    // ===== HELPERS =====
+    const getMonday = d => { const x = new Date(d); const day = x.getDay(); x.setDate(x.getDate() - day + (day===0 ? -6 : 1)); return x; };
+    const fmtKey = d => d.toISOString().split('T')[0];
+    const getWeekNum = d => { const x = new Date(d); x.setHours(0,0,0,0); x.setDate(x.getDate()+4-(x.getDay()||7)); const y = new Date(x.getFullYear(),0,1); return Math.ceil(((x-y)/864e5+1)/7); };
+    const parseKey = k => new Date(k + 'T12:00:00');
+    const dayIdxFromKey = k => { const dow = parseKey(k).getDay(); return dow === 0 ? 6 : dow - 1; };
+
+    // ===== STATE =====
+    let S = { dailyCompleted: {}, exerciseTracking: {}, records: { chinupsMax:0, pushupMax:0, kbSwingWeight:0 } };
+    const save = () => { try { localStorage.setItem('td_state', JSON.stringify(S)); } catch(e){} };
+    const load = () => { try { const x = localStorage.getItem('td_state'); if(x) S = { ...S, ...JSON.parse(x) }; } catch(e){} };
+
+    // ===== NAV =====
+    const tabs = [
+      { id:'home', label:'Idag', icon:'🏠' },
+      { id:'schedule', label:'Schema', icon:'📅' },
+      { id:'calendar', label:'Kalender', icon:'📆' },
+      { id:'records', label:'PR', icon:'📊' }
+    ];
+    let activeTab = 'home';
+    let expandedDay = null;
+    let calMonth = new Date().getMonth();
+
+    function renderNav() {
+      const nav = document.getElementById('navBar');
+      nav.innerHTML = tabs.map(t =>
+        `<button class="nav-btn ${t.id===activeTab?'active':''}" onclick="switchTab('${t.id}')"><span class="ico">${t.icon}</span>${t.label}</button>`
+      ).join('');
+    }
+
+    function switchTab(id) {
+      activeTab = id;
+      renderNav();
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('tab-'+id).classList.add('active');
+      renderTab(id);
+      document.getElementById('scrollArea').scrollTop = 0;
+    }
+
+    function renderTab(id) {
+      if (id==='home') renderHome();
+      else if (id==='schedule') renderSchedule();
+      else if (id==='calendar') renderCalendar();
+      else if (id==='records') renderRecords();
+    }
+
+    // ===== TOGGLE LOGIC =====
+    function toggleExercise(dateKey, idx) {
+      const k = dateKey+'_ex_'+idx;
+      S.exerciseTracking[k] = !S.exerciseTracking[k];
+
+      const di = dayIdxFromKey(dateKey);
+      const day = dayNames[di];
+      const t = schedule[day];
+      if (t && t.exercises.length > 0 && day !== 'Lördag') {
+        let all = true;
+        for (let i=0; i<t.exercises.length; i++) { if (!S.exerciseTracking[dateKey+'_ex_'+i]) { all=false; break; } }
+        S.dailyCompleted[dateKey] = all;
+      }
+      save(); renderTab(activeTab);
+    }
+
+    function toggleDay(dateKey) {
+      const di = dayIdxFromKey(dateKey);
+      const day = dayNames[di];
+      const t = schedule[day];
+      const was = S.dailyCompleted[dateKey];
+
+      if (t && t.exercises.length > 0 && day !== 'Lördag') {
+        for (let i=0; i<t.exercises.length; i++) S.exerciseTracking[dateKey+'_ex_'+i] = !was;
+      }
+      S.dailyCompleted[dateKey] = !was;
+      save(); renderTab(activeTab);
+    }
+
+    // ===== RENDER HOME =====
+    function renderHome() {
+      const el = document.getElementById('tab-home');
+      const today = new Date();
+      const todayKey = fmtKey(today);
+      const monday = getMonday(today);
+      const di = today.getDay() === 0 ? 6 : today.getDay()-1;
+      const dayName = dayNames[di];
+      const t = schedule[dayName];
+      const isDone = S.dailyCompleted[todayKey];
+
+      let weekDone = 0;
+      for (let i=0;i<7;i++) { const d=new Date(monday); d.setDate(d.getDate()+i); if(S.dailyCompleted[fmtKey(d)]) weekDone++; }
+
+      const compEx = t.exercises.filter((_,i) => S.exerciseTracking[todayKey+'_ex_'+i]).length;
+      const totEx = t.exercises.length;
+      const pct = totEx > 0 ? Math.round(compEx/totEx*100) : 0;
+      const isRest = dayName === 'Lördag';
+
+      let h = '';
+
+      // Hero
+      h += `<div class="hero" style="background:linear-gradient(135deg,${t.color}dd,${t.color}88)">
+        <div class="bg-emoji">${t.emoji}</div>
+        <div class="label">${dayName} ${today.getDate()} ${monthShort[today.getMonth()]}</div>
+        <div class="title">${t.type}</div>
+        <div class="meta">${t.duration}</div>
+      </div>`;
+
+      // Week progress
+      h += `<div class="card week-mini">
+        <div class="week-label">Vecka ${getWeekNum(today)}</div>
+        <div style="flex:1"><div class="pbar"><div class="pbar-fill" style="width:${weekDone/6*100}%"></div></div></div>
+        <div class="week-val">${weekDone}/6</div>
+      </div>`;
+
+      // Exercises
+      if (totEx > 0 && !isRest) {
+        h += `<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <div style="font-size:14px;font-weight:700">Övningar</div>
+          <div style="font-size:12px;font-weight:700;color:${isDone?'var(--green)':'var(--blue)'};background:${isDone?'rgba(34,197,94,0.15)':'rgba(59,130,246,0.15)'};padding:4px 10px;border-radius:20px">${isDone?'✓ Klar!':compEx+'/'+totEx}</div>
+        </div>`;
+        t.exercises.forEach((ex,i) => {
+          const done = S.exerciseTracking[todayKey+'_ex_'+i];
+          h += `<div class="ex-item ${done?'done':''}" onclick="toggleExercise('${todayKey}',${i})">
+            <div class="check-circle ${done?'on':''}">${done?'✓':''}</div>
+            <div style="flex:1">
+              <div class="ex-name ${done?'struck':''}">${ex.name}</div>
+              <div class="ex-reps">${ex.reps}</div>
+              ${ex.notes ? `<div class="ex-notes">${ex.notes}</div>` : ''}
+            </div>
+          </div>`;
+        });
+        if (!isDone) h += `<button class="btn-big" style="background:linear-gradient(135deg,var(--green),#16a34a)" onclick="toggleDay('${todayKey}')">Markera allt som klart</button>`;
+        h += `</div>`;
+      } else {
+        h += `<div class="card" style="text-align:center;padding:32px">
+          <div style="font-size:40px;margin-bottom:12px">${t.emoji}</div>
+          <div style="font-size:16px;font-weight:700">${t.type}</div>
+          <div style="font-size:13px;color:var(--text2);margin-top:4px">Vila & återhämtning</div>
+        </div>`;
+      }
+
+      // Progress / done
+      if (totEx > 0 && !isDone && compEx > 0) {
+        h += `<div class="card"><div style="display:flex;justify-content:space-between;margin-bottom:8px">
+          <span style="font-size:12px;color:var(--text2)">Framsteg</span>
+          <span style="font-size:14px;font-weight:800;color:var(--blue)">${pct}%</span>
+        </div><div class="pbar" style="height:8px"><div class="pbar-fill" style="width:${pct}%"></div></div></div>`;
+      }
+
+      if (isDone) {
+        h += `<div class="card" style="background:rgba(34,197,94,0.1);border:2px solid rgba(34,197,94,0.3);text-align:center;padding:24px">
+          <div style="font-size:36px;margin-bottom:8px">✅</div>
+          <div style="font-size:16px;font-weight:700;color:var(--green)">Dagens träning klar!</div>
+          <button onclick="toggleDay('${todayKey}')" style="margin-top:12px;padding:8px 20px;background:transparent;border:1px solid var(--bg3);border-radius:8px;color:var(--text2);font-size:12px;cursor:pointer;font-family:inherit">Ångra</button>
+        </div>`;
+      }
+
+      el.innerHTML = h;
+    }
+
+    // ===== RENDER SCHEDULE =====
+    function renderSchedule() {
+      const el = document.getElementById('tab-schedule');
+      const today = new Date();
+      const todayKey = fmtKey(today);
+      const monday = getMonday(today);
+
+      let weekDone = 0;
+      for (let i=0;i<7;i++) { const d=new Date(monday); d.setDate(d.getDate()+i); if(S.dailyCompleted[fmtKey(d)]) weekDone++; }
+
+      let h = '';
+
+      // Stats
+      h += `<div class="stats-row">
+        <div class="card stat" style="margin-bottom:0"><div class="val">${getWeekNum(today)}</div><div class="lbl">Vecka</div></div>
+        <div class="card stat" style="margin-bottom:0"><div class="val">${weekDone}/6</div><div class="lbl">Klara</div></div>
+        <div class="card stat" style="margin-bottom:0"><div class="val">${weekDone>2?weekDone:0}</div><div class="lbl">Streak</div></div>
+      </div>`;
+
+      h += `<div class="week-grid-desktop">`;
+      dayNames.forEach((day, idx) => {
+        const d = new Date(monday); d.setDate(d.getDate()+idx);
+        const dk = fmtKey(d);
+        const t = schedule[day];
+        const isDone = S.dailyCompleted[dk];
+        const isToday = dk === todayKey;
+        const isExp = expandedDay === dk;
+        const isRest = day === 'Lördag';
+
+        const dateStr = d.getDate()+'/'+String(d.getMonth()+1)+'-'+String(d.getFullYear()).slice(-2);
+
+        h += `<div class="card day-card ${isToday?'today-border':''} ${isDone?'done-border':''}">
+          <div class="day-row" onclick="toggleExpand('${dk}')">
+            <div class="day-emoji">${t.emoji}</div>
+            <div style="flex:1">
+              <div style="display:flex;align-items:center">
+                <span class="day-name">${day}</span>
+                ${isToday?'<span class="day-badge">IDAG</span>':''}
+                <span style="font-size:11px;color:var(--text3);margin-left:8px">${dateStr}</span>
+              </div>
+              <div class="day-type">${t.type}</div>
+              <div class="day-dur">${t.duration}</div>
+            </div>
+            <div class="day-check-big ${isDone?'on':''}" onclick="event.stopPropagation();${!isRest?`toggleDay('${dk}')`:''}">${isDone?'✓':''}</div>
+          </div>`;
+
+        if (isExp && t.exercises.length > 0 && !isRest) {
+          h += `<div class="day-exercises">`;
+          t.exercises.forEach((ex,i) => {
+            const exDone = S.exerciseTracking[dk+'_ex_'+i];
+            h += `<div class="ex-item ${exDone?'done':''}" onclick="toggleExercise('${dk}',${i})">
+              <div class="check-circle ${exDone?'on':''}" style="width:20px;height:20px;border-radius:5px;font-size:11px">${exDone?'✓':''}</div>
+              <div style="flex:1">
+                <div class="ex-name ${exDone?'struck':''}" style="font-size:13px">${ex.name}</div>
+                <div class="ex-reps" style="font-size:11px">${ex.reps}</div>
+                ${ex.notes ? `<div class="ex-notes">${ex.notes}</div>` : ''}
+              </div>
+            </div>`;
+          });
+          h += `</div>`;
+        }
+
+        h += `</div>`;
+      });
+      h += `</div>`;
+
+      el.innerHTML = h;
+    }
+
+    function toggleExpand(dk) { expandedDay = expandedDay === dk ? null : dk; renderSchedule(); }
+
+    // ===== RENDER CALENDAR =====
+    function renderCalendar() {
+      const el = document.getElementById('tab-calendar');
+      const m = calMonth;
+      const todayKey = fmtKey(new Date());
+      const firstDay = new Date(2026, m, 1).getDay();
+      const startDay = firstDay === 0 ? 6 : firstDay - 1;
+      const dim = new Date(2026, m+1, 0).getDate();
+
+      let mCount = 0;
+      for (let d=1; d<=dim; d++) { if (S.dailyCompleted[fmtKey(new Date(2026,m,d))]) mCount++; }
+
+      let h = '';
+
+      // Nav
+      h += `<div class="cal-nav">
+        <button class="cal-arrow" onclick="calMonth=Math.max(0,calMonth-1);renderCalendar()">←</button>
+        <div><div class="cal-label">${monthFull[m]}</div><div class="cal-sub">${mCount} pass genomförda</div></div>
+        <button class="cal-arrow" onclick="calMonth=Math.min(11,calMonth+1);renderCalendar()">→</button>
+      </div>`;
+
+      // Grid
+      h += `<div class="card"><div class="cal-grid">`;
+      ['Mån','Tis','Ons','Tor','Fre','Lör','Sön'].forEach(d => { h += `<div class="cal-hdr">${d}</div>`; });
+      for (let i=0; i<startDay; i++) h += `<div></div>`;
+      for (let d=1; d<=dim; d++) {
+        const dk = fmtKey(new Date(2026, m, d));
+        const done = S.dailyCompleted[dk];
+        const isToday = dk === todayKey;
+        h += `<div class="cal-day ${done?'done':''} ${isToday&&!done?'today':''}" onclick="S.dailyCompleted['${dk}']=!S.dailyCompleted['${dk}'];save();renderCalendar()">${d}</div>`;
+      }
+      h += `</div></div>`;
+
+      // Year overview
+      h += `<div class="card" style="margin-top:12px"><div style="font-size:13px;font-weight:700;margin-bottom:12px">Årsöversikt 2026</div><div class="year-grid">`;
+      monthFull.forEach((mn, mi) => {
+        let cnt = 0;
+        const dims = new Date(2026, mi+1, 0).getDate();
+        for (let d=1; d<=dims; d++) { if (S.dailyCompleted[fmtKey(new Date(2026,mi,d))]) cnt++; }
+        h += `<div class="year-month ${mi===calMonth?'sel':''}" onclick="calMonth=${mi};renderCalendar()">
+          <div class="mn">${monthShort[mi]}</div>
+          <div class="cnt" style="color:${cnt>0?'var(--green)':'var(--bg3)'}">${cnt}</div>
+        </div>`;
+      });
+      h += `</div></div>`;
+
+      el.innerHTML = h;
+    }
+
+    // ===== RENDER RECORDS =====
+    function renderRecords() {
+      const el = document.getElementById('tab-records');
+      let total = 0;
+      Object.values(S.dailyCompleted).forEach(v => { if(v) total++; });
+
+      let h = '';
+
+      // PR
+      h += `<div class="card"><div style="font-size:15px;font-weight:700;margin-bottom:16px">Personliga Rekord</div>`;
+      [
+        { key:'chinupsMax', label:'Chin-ups (max reps)', icon:'💪' },
+        { key:'pushupMax', label:'Armhävningar (max reps)', icon:'🔥' },
+        { key:'kbSwingWeight', label:'KB Swing (kg)', icon:'🏋️' }
+      ].forEach(r => {
+        h += `<div class="rec-row">
+          <div class="rec-icon">${r.icon}</div>
+          <div style="flex:1">
+            <div class="rec-lbl">${r.label}</div>
+            <input type="number" class="rec-input" id="rec_${r.key}" value="${S.records[r.key]||''}" placeholder="0"
+              onchange="S.records['${r.key}']=parseFloat(this.value)||0;save()">
+          </div>
+        </div>`;
+      });
+      h += `</div>`;
+
+      // Training detail
+      h += `<div class="card"><div style="font-size:15px;font-weight:700;margin-bottom:12px">Övningsresultat</div>
+        <select class="detail-select" id="trainingSelect" onchange="renderExerciseDetails()">
+          <option value="">Välj träning</option>
+          <option value="A">Träning A – Måndag (Push + Posterior)</option>
+          <option value="B">Träning B – Onsdag (Pull + Core)</option>
+          <option value="C">Träning C – Fredag (Legs + KB Power)</option>
+        </select>
+        <div id="exerciseDetails"></div>
+      </div>`;
+
+      // Totals
+      h += `<div class="card"><div style="font-size:15px;font-weight:700;margin-bottom:16px">Total Statistik</div>
+        <div class="total-grid">
+          <div class="total-box"><div class="total-val" style="color:var(--blue)">${total}</div><div class="total-lbl">Totalt pass</div></div>
+          <div class="total-box"><div class="total-val" style="color:var(--green)">~${Math.round(total*45)}</div><div class="total-lbl">Minuter</div></div>
+        </div>
+      </div>`;
+
+      // Reset
+      h += `<button class="btn-danger" onclick="if(confirm('Vill du nollställa ALL data? Detta går inte att ångra.')){S={dailyCompleted:{},exerciseTracking:{},records:{chinupsMax:0,pushupMax:0,kbSwingWeight:0}};save();renderTab(activeTab);}">Nollställ all data</button>`;
+
+      el.innerHTML = h;
+    }
+
+    function renderExerciseDetails() {
+      const sel = document.getElementById('trainingSelect');
+      const div = document.getElementById('exerciseDetails');
+      if (!sel.value) { div.innerHTML = ''; return; }
+      const exs = trainingExercises[sel.value];
+      div.innerHTML = exs.map(ex => `
+        <div class="detail-item">
+          <div class="detail-name">${ex}</div>
+          <div class="detail-inputs">
+            <input type="text" class="detail-inp" placeholder="Set 1">
+            <input type="text" class="detail-inp" placeholder="Set 2">
+            <input type="text" class="detail-inp" placeholder="Set 3">
+            <input type="text" class="detail-inp" placeholder="Set 4">
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // ===== INIT =====
+    load();
+    renderNav();
+    renderHome();
+
+    // Prevent double-tap zoom on mobile
+    let lastTouch = 0;
+    document.addEventListener('touchend', e => {
+      const now = Date.now();
+      if (now - lastTouch <= 300) e.preventDefault();
+      lastTouch = now;
+    }, false);
+  </script>
+</body>
+</html>
