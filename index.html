@@ -13,8 +13,6 @@
   <!-- App icon as inline SVG data URI for Apple -->
   <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxODAgMTgwIj48cmVjdCB3aWR0aD0iMTgwIiBoZWlnaHQ9IjE4MCIgcng9IjQwIiBmaWxsPSIjMGYxNzJhIi8+PHRleHQgeD0iOTAiIHk9IjExNSIgZm9udC1zaXplPSI5MCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+8J+SpjwvdGV4dD48L3N2Zz4=">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
-
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
     :root {
@@ -36,7 +34,7 @@
 
     html, body {
       width: 100%; height: 100%;
-      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: Consolas, 'Courier New', monospace;
       background: var(--bg);
       color: var(--text);
       line-height: 1.5;
@@ -293,76 +291,85 @@
     // ===== TRAINING DATA =====
     const schedule = {
       Måndag: {
-        type: 'Träning A – Push + Posterior', duration: '45–60 min', emoji: '🏋️', color: '#3b82f6',
+        type: 'Träning A — Push + Posterior', duration: '55–65 min', emoji: '🏋️', color: '#E84545',
         exercises: [
-          { name: 'Kettlebell Deadlift', reps: '4×8-10', notes: 'Stark rumpa & baksida lår' },
-          { name: 'Armhävningar', reps: '4×max–2', notes: 'Lämna 2 i tanken' },
-          { name: 'KB Single-Leg RDL', reps: '3×10-12/ben', notes: 'Balans + rumpa' },
-          { name: 'Dips', reps: '4×8-12', notes: '' },
-          { name: 'Face pulls / KB rows', reps: '3×12-15', notes: 'Övre rygg & hållning' },
-          { name: 'Planka Shoulder taps', reps: '3×30-40s', notes: 'Anti-extension core' }
+          { name: 'Barbell/KB Deadlift', reps: '4×8–10', notes: 'Posterior chain-grund. Kör tungt men tekniskt. Neutral rygg hela vägen.' },
+          { name: 'Dumbbell Bench Press', reps: '4×8–12', notes: 'Bröst + främre delt. Sänk kontrollerat, pressa explosivt. Skulderbladet ihop mot bänken.' },
+          { name: 'DB Overhead Press (stående)', reps: '4×8–12', notes: 'Stående för core-aktivering. Spann magen hårt, undvik att svanka.' },
+          { name: 'Dips (bänk eller barr)', reps: '4×8–12', notes: 'Triceps + bröst. Framåtlutning = mer bröst. Upprätt = mer triceps. Vikta om för lätt.' },
+          { name: 'Single-Leg DB RDL', reps: '3×10–12/ben', notes: 'Hamstrings & rumpa unilateralt. Fixar obalanser och aktiverar glutes mot APT.' },
+          { name: 'DB Lateral Raises', reps: '3×12–15', notes: 'Sidodelts för bredd. Kontrollerad excentrik, inga svängningar.' },
+          { name: 'DB Rear Delt Flyes', reps: '3×12–15', notes: 'Korrigerar rounded shoulders. Squeeze i toppen 1 sek.' },
+          { name: 'EZ-bar Skull Crushers', reps: '3×10–12', notes: 'Triceps-isolation. Långsam excentrisk fas. Armbågarna pekar rakt upp.' },
+          { name: 'Weighted Plank', reps: '3×30–45s', notes: 'Platta med skiva på ryggen. Spann glutes & mage. Anti-extension mot APT.' }
         ]
       },
       Tisdag: {
-        type: 'Rehab & Rörlighet', duration: '20–30 min', emoji: '🧘', color: '#8b5cf6',
+        type: 'Rehab & Rörlighet', duration: '25–30 min', emoji: '🧘', color: '#4ECDC4',
         exercises: [
-          { name: 'Höftböjare-stretch (90/90)', reps: '2×60-90 sek/sida', notes: '' },
-          { name: 'Adductor rock back', reps: '2 min', notes: 'Grodläge' },
-          { name: 'Glute bridge hold med band', reps: '3×30-45 sek', notes: '' },
-          { name: 'Cat-cow + thoracic rotations', reps: '10 varv', notes: '' },
-          { name: 'Dead bugs', reps: '3×10/sida', notes: 'Långsamt' },
-          { name: "Child's pose + bröstryggsrot.", reps: '2 min', notes: '' },
-          { name: 'Standing hip hinge + wall touch', reps: '2×15', notes: 'Neutral bäcken' }
+          { name: 'Couch Stretch / 90-90 höftböjare', reps: '2×60–90s/sida', notes: 'Huvudövningen mot APT. Håll rumpan spänd, undvik att svanka.' },
+          { name: 'Adductor Rock Back (grodläge)', reps: '2 min totalt', notes: 'Öppnar höfterna. Andas djupt och sjunk ner gradvis.' },
+          { name: 'Banded Glute Bridge Hold', reps: '3×30–45s', notes: 'Aktiverar glutes som motverkar APT. Band runt knäna, pressa utåt.' },
+          { name: 'Cat-Cow + Thoracic Rotation', reps: '10 varv + 5/sida', notes: 'Foam roller under bröstryggen på gym. Andas ut i rotationen.' },
+          { name: 'Dead Bugs (långsamt)', reps: '3×10/sida', notes: 'Ryggen PLATT mot golvet hela tiden. Gör det rätt, inte snabbt.' },
+          { name: 'Wall Angels', reps: '2×15', notes: 'Hela ryggen + händerna mot väggen. Extremt bra för rounded shoulders.' },
+          { name: "Child's Pose + Rotation", reps: '2 min', notes: 'En hand bakom huvudet, rotera upp mot taket. Andas.' },
+          { name: 'Wall Hip Hinge', reps: '2×15', notes: 'Lär kroppen neutral bäckenposition. Rumpa rör väggen, platt rygg.' }
         ]
       },
       Onsdag: {
-        type: 'Träning B – Pull + Core', duration: '45–60 min', emoji: '💪', color: '#06b6d4',
+        type: 'Träning B — Pull + Arms', duration: '55–65 min', emoji: '💪', color: '#E84545',
         exercises: [
-          { name: 'Chin-ups / Pull-ups', reps: '4×max–1', notes: 'Mål: öka reps' },
-          { name: 'KB Gorilla Rows', reps: '4×10-12/arm', notes: 'Rygg & grepp' },
-          { name: 'Inverted rows', reps: '3×10-12', notes: '' },
-          { name: 'Hollow Hold', reps: '4×20-40s', notes: 'Super mot APT' },
-          { name: 'Hanging Leg Raises', reps: '3×12-15', notes: 'Nedre magen' },
-          { name: 'Bird-Dog', reps: '3×12-15/sida', notes: 'Perfekt för hållning' }
+          { name: 'Pull-ups / Chin-ups (viktade)', reps: '4×max (lämna 1 i tanken)', notes: 'Ryggens kung. Viktbälte när du klarar 10+ reps. Full ROM.' },
+          { name: 'KB Gorilla Rows', reps: '4×10–12/arm', notes: 'Bred rygg + grepp. Dra mot höften, squeeze skulderbladet.' },
+          { name: 'Barbell Bent-Over Rows', reps: '3×10–12', notes: 'Övre rygg för hållning. 45° framåtlutning, dra mot naveln.' },
+          { name: 'Face Pulls med band/kabel', reps: '3×15–20', notes: 'Bakre delt + rotatorkuff. Dra mot pannan, extern rotation i slutet.' },
+          { name: 'Barbell/EZ-bar Curls', reps: '3×10–12', notes: 'Tungt compound-arbete för biceps. Stå upprätt, inga svingningar.' },
+          { name: 'DB Concentration Curls', reps: '3×12–15/arm', notes: 'Högst EMG-aktivering av alla curl-varianter. Långsam excentrisk.' },
+          { name: 'Hanging Leg Raises', reps: '3×12–15', notes: 'Nedre core utan att svanka. Posteriör bäckentilt i toppen.' },
+          { name: 'Pallof Press', reps: '3×12–15/sida', notes: 'Anti-rotation. Mycket bättre än love handles twist för midja.' },
+          { name: 'Bird-Dog (med DB)', reps: '3×12/sida', notes: 'Hållning + core-stabilitet. Håll 2 sek i toppläget.' }
         ]
       },
       Torsdag: {
-        type: 'Rehab & Rörlighet', duration: '20–30 min', emoji: '🧘', color: '#8b5cf6',
+        type: 'Rehab & Rörlighet', duration: '25–30 min', emoji: '🧘', color: '#4ECDC4',
         exercises: [
-          { name: 'Höftböjare-stretch (90/90)', reps: '2×60-90 sek/sida', notes: '' },
-          { name: 'Adductor rock back', reps: '2 min', notes: 'Grodläge' },
-          { name: 'Glute bridge hold med band', reps: '3×30-45 sek', notes: '' },
-          { name: 'Cat-cow + thoracic rotations', reps: '10 varv', notes: '' },
-          { name: 'Dead bugs', reps: '3×10/sida', notes: 'Långsamt' },
-          { name: "Child's pose + bröstryggsrot.", reps: '2 min', notes: '' },
-          { name: 'Standing hip hinge + wall touch', reps: '2×15', notes: 'Neutral bäcken' }
+          { name: 'Couch Stretch / 90-90 höftböjare', reps: '2×60–90s/sida', notes: 'Samma som tisdag. Gör den VARJE gång, den är viktigast.' },
+          { name: 'Pigeon Pose (yoga)', reps: '90s/sida', notes: 'Djup höftöppnare. Andas och släpp ner gradvis.' },
+          { name: 'Banded Glute Bridge Hold', reps: '3×30–45s', notes: 'Konsekvent glute-aktivering. Tryck knäna utåt mot bandet.' },
+          { name: 'Foam Roller Thoracic Extension', reps: '2 min', notes: 'Rulla övre ryggen. Pausa på stela punkter och andas.' },
+          { name: 'Thread the Needle', reps: '8/sida', notes: 'Bröstryggsrotation i barnställning. Följ handen med blicken.' },
+          { name: 'Prone Y-T-W Raises', reps: '2×10 av varje', notes: 'Ligg på mage, lyft armarna i Y, T och W. Skulderblad + rotatorkuff.' },
+          { name: 'Dead Bugs', reps: '3×10/sida', notes: 'Aldrig för mycket dead bugs. Ryggen platt. Andas ut vid utsträckning.' },
+          { name: 'Wall Hip Hinge', reps: '2×15', notes: 'Avsluta med neutral bäcken-drillning.' }
         ]
       },
       Fredag: {
-        type: 'Träning C – Legs + KB Power', duration: '50–60 min', emoji: '🔥', color: '#f97316',
+        type: 'Träning C — Legs + Power', duration: '55–65 min', emoji: '🔥', color: '#E84545',
         exercises: [
-          { name: 'KB Goblet Squats', reps: '4×10-12', notes: 'Djup & upprätt' },
-          { name: 'KB Swings', reps: '4×15-20', notes: 'Explosiv höft' },
-          { name: 'Bulgarian Split Squats', reps: '3×10-12/ben', notes: 'Rumpa & stabilitet' },
-          { name: 'KB Thrusters', reps: '3×10-12', notes: 'Helkropp' },
-          { name: 'Glute Bridge', reps: '3×12-15', notes: 'Aktivera max' },
-          { name: 'Dead Bug', reps: '3×12-15/sida', notes: 'Core utan svank' }
+          { name: 'Barbell Back Squat / KB Goblet Squat', reps: '4×8–12', notes: 'Benens huvudövning. Full djup, upprätt bröst. Squat-skor hjälper.' },
+          { name: 'KB Swings (rysk stil)', reps: '4×15–20', notes: 'Explosiv höftextension. Spän rumpan HÅRT i toppen. Andas ut.' },
+          { name: 'DB Bulgarian Split Squats', reps: '3×10–12/ben', notes: 'Glutes + quads unilateralt. Framfoten långt fram för mer rumpa.' },
+          { name: 'Barbell Hip Thrust', reps: '4×10–12', notes: 'Bästa isolerade glute-övningen. Kör tungt. Posterior pelvic tilt i toppen.' },
+          { name: 'Walking Lunges (DB)', reps: '3×12/ben', notes: 'Funktionell benstyrka. Längre steg = mer glutes.' },
+          { name: 'Dead Bug med vikt', reps: '3×12/sida', notes: 'Håll en KB eller platta över bröstet. Ryggen platt.' },
+          { name: "Farmer's Walk", reps: '3×40m', notes: 'Core, grepp, hållning, kondition. Gå rakt, axlorna ner och bak.' }
         ]
       },
       Lördag: {
-        type: 'Vila / Aktiv återhämtning', duration: '–', emoji: '😴', color: '#6b7280',
-        exercises: [{ name: 'Promenad, lätt yoga, fotboll', reps: '', notes: '' }]
+        type: 'Vila / Aktiv Återhämtning', duration: '—', emoji: '😴', color: '#888',
+        exercises: []
       },
       Söndag: {
-        type: 'Stretch', duration: '15–20 min', emoji: '🌿', color: '#22c55e',
-        exercises: [{ name: 'Fullkroppsstretch', reps: '15-20 min', notes: 'Höftböjare & bröstrygg' }]
+        type: 'Vila + Stretch', duration: '15–20 min', emoji: '🌿', color: '#888',
+        exercises: []
       }
     };
 
     const trainingExercises = {
-      A: ['Kettlebell Deadlift','Armhävningar','KB Single-Leg RDL','Dips','Face pulls / KB rows','Planka Shoulder taps'],
-      B: ['Chin-ups / Pull-ups','KB Gorilla Rows','Inverted rows','Hollow Hold','Hanging Leg Raises','Bird-Dog'],
-      C: ['KB Goblet Squats','KB Swings','Bulgarian Split Squats','KB Thrusters','Glute Bridge','Dead Bug']
+      A: ['Barbell/KB Deadlift','Dumbbell Bench Press','DB Overhead Press (stående)','Dips (bänk eller barr)','Single-Leg DB RDL','DB Lateral Raises','DB Rear Delt Flyes','EZ-bar Skull Crushers','Weighted Plank'],
+      B: ['Pull-ups / Chin-ups (viktade)','KB Gorilla Rows','Barbell Bent-Over Rows','Face Pulls med band/kabel','Barbell/EZ-bar Curls','DB Concentration Curls','Hanging Leg Raises','Pallof Press','Bird-Dog (med DB)'],
+      C: ['Barbell Back Squat / KB Goblet Squat','KB Swings (rysk stil)','DB Bulgarian Split Squats','Barbell Hip Thrust','Walking Lunges (DB)','Dead Bug med vikt',"Farmer's Walk"]
     };
 
     const dayNames = ['Måndag','Tisdag','Onsdag','Torsdag','Fredag','Lördag','Söndag'];
@@ -676,9 +683,9 @@
       h += `<div class="card"><div style="font-size:15px;font-weight:700;margin-bottom:12px">Övningsresultat</div>
         <select class="detail-select" id="trainingSelect" onchange="renderExerciseDetails()">
           <option value="">Välj träning</option>
-          <option value="A">Träning A – Måndag (Push + Posterior)</option>
-          <option value="B">Träning B – Onsdag (Pull + Core)</option>
-          <option value="C">Träning C – Fredag (Legs + KB Power)</option>
+          <option value="A">Träning A — Måndag (Push + Posterior)</option>
+          <option value="B">Träning B — Onsdag (Pull + Arms)</option>
+          <option value="C">Träning C — Fredag (Legs + Power)</option>
         </select>
         <div id="exerciseDetails"></div>
       </div>`;
